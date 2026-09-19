@@ -11,6 +11,17 @@ Sitenin mantığı çok basit: Giriyorsun, sol üstten kendini seçiyorsun ve ka
 * ** Zeka, Sezgi, Kaos ve Mizah:** Arkadaşlarını bu dört metrik üzerinden puanla! Grubun en kaotik ismi kim, mizahşörü kim burada eğlencesine belli oluyor.
 * ** Görev Panosu:** Ekiple yapılacak planları, etkinlikleri veya eğlenceli görevleri asabileceğin interaktif bir pano.
 
+## ⚙️ Geliştirici Notu ve Proje Süreci
+
+Bu proje, insanların birbirlerine kalıcı ve anlamlı anılar bırakabileceği interaktif bir platform yaratma amacıyla tamamen bireysel bir fikir olarak ortaya çıkmıştır. Projenin fikir aşamasından kodlama sürecinin sonuna kadar olan tüm geliştirme adımları, yapay zeka  asistanlığıyla yürütülmüştür.
+
+Kullanıcıların kendi profillerini seçip diğer kişiler arasında gezinebilmesi, kişiye özel notlar bırakılabilmesi ve arayüzdeki diğer tüm interaktif özellikler; temel web teknolojileri kullanılarak adım adım kurgulanmıştır. Tasarım mantığının oluşturulması ve algoritmaların koda dökülmesi süreçlerinde yapay zeka ile  çalışılmıştır.
+
+Bu proje, bireysel bir vizyonun ve yenilikçi bir fikrin, modern yapay zeka araçlarıyla desteklendiğinde ne kadar hızlı ve verimli bir şekilde çalışan bir ürüne dönüşebileceğini gösteren somut bir örnektir. Yapay zekayı yalnızca bir araç değil, aktif bir kod partneri olarak kullanmak bu projenin temel yapı taşlarından biri olmuştur.
+
+Projeyi geliştirirken  kod hatalarım veya eksiklerim olabilir. Mevcut yapılar muhtemelen çok daha iyi bir şekilde kodlanabilir veya daha pratik çözümlerle baştan yazılabilir. Eğer kodları incelediğinizde "bu kısım daha iyi yapılabilir" derseniz veya hatalarımı fark ederseniz; her türlü tavsiyenize, eleştirinize ve doğrudan kod katkılarınıza (Pull Request) sonuna kadar açığım. 
+
+
 ##  Kendi Tayfana Göre Özelleştir (Kurulum)
 
 Bu projeyi sadece kodlar dursun ve başkaları da kendi grubu için kullanabilsin diye yayınlıyorum. Kendi resimlerimi projeden kaldırdım. Bunu kendi grubuna uyarlamak için şunları yapman gerekiyor:
