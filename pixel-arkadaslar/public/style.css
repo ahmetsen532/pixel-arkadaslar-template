@@ -1,0 +1,1634 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Press Start 2P', cursive;
+    image-rendering: pixelated;
+}
+
+
+/* --- VARSAYILAN (GECE) TEMASI --- */
+:root {
+    /* Gece yağmuru: Siyah (Senin istediğin gibi) */
+    --rain-color: rgba(0, 0, 0, 0.8); 
+}
+
+/* =========================================
+   DİNAMİK GÖKYÜZÜ TEMALARI
+   ========================================= */
+
+/* --- GÜNDÜZ (06:00 - 17:00) --- */
+.theme-day {
+    /* Gökyüzü arka planın burada... */
+    background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+    
+    /* Gündüz Yağmuru: Parlak ve net bir MAVİ */
+    --rain-color: rgba(0, 150, 255, 0.7); 
+}
+
+/* --- GÜN BATIMI / LO-FI AKŞAMÜSTÜ (17:00 - 20:00) --- */
+.theme-sunset {
+    /* Gökyüzü arka planın burada... */
+    background: linear-gradient(180deg, #ff7b54 0%, #2b1b42 100%);
+    
+    /* Gün Batımı Yağmuru: Gündüze göre çok az daha loş bir MAVİ */
+    --rain-color: rgba(50, 100, 255, 0.7); 
+}
+
+
+
+
+body {
+    /* Siyah yerine daha ferah, retro bir mor/lacivert geçişi */
+    background: linear-gradient(180deg, #2b1b42 0%, #100820 100%);
+    color: white;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- IŞIKLI NEON ARKA PLAN --- */
+.retro-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+    contain: strict;
+}
+
+/* Rengarenk Akan Performanslı Izgara */
+.neon-grid {
+    position: absolute;
+    bottom: -50%;
+    left: -50%;
+    width: 200%;
+    height: 150%;
+    /* Çizgileri biraz daha parlak ve kalın yaptık ki gölgeye ihtiyaç kalmasın */
+    background-image:
+        linear-gradient(rgba(0, 255, 255, 0.8) 3px, transparent 3px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.8) 3px, transparent 3px);
+    background-size: 50px 50px;
+    transform: perspective(600px) rotateX(70deg);
+    
+    /* Kasma sorunu için GPU hızlandırma (ÇOK ÖNEMLİ) */
+    will-change: transform, filter, background-position; 
+    
+    /* Hem ileri aksın hem de saniyeler içinde tüm neon renkleri dönsün */
+    animation: moveAndColorGrid 3s linear infinite;
+    will-change: transform, filter, background-position;
+    transform: perspective(600px) rotateX(70deg) translateZ(0);
+}
+
+/* Renk Çarkı Animasyonu: hue-rotate tüm renkleri sırayla değiştirir! */
+@keyframes moveAndColorGrid {
+    0% { background-position: 0 0; filter: hue-rotate(0deg); }
+    100% { background-position: 0 50px; filter: hue-rotate(360deg); }
+}
+
+/* Arka planda parlayan pixel yıldızlar */
+.glowing-star {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background-color: #fff;
+    /* Kasmasın diye ağır shadow yerine basit glow */
+    border-radius: 50%;
+    animation: twinkle 1s steps(3) infinite alternate;
+    will-change: opacity, transform;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.1; transform: scale(0.8); }
+    100% { opacity: 0.8; transform: scale(1.2); }
+}
+
+/* --- TAM EKRAN DÜZENİ VE GEÇİŞLER --- */
+/* 4. ANA İÇERİK (Yazılar ve resim yağmurun arkasında kalmasın diye en öne alındı) */
+.full-screen-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20; /* En ön katman */
+    transition: transform 0.6s steps(10);
+}
+
+.slider-section {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.portrait-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    max-width: 80%;
+    will-change: transform, opacity;
+    transform: translateZ(0); /* GPU'yu zorla aç (Geçişteki FPS'i uçurur) */
+}
+
+.pixel-img {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    /* Performans için gölgeyi biraz hafiflettik */
+    filter: drop-shadow(5px 5px 0px rgba(0, 255, 255, 0.4));
+    transition: filter 0.2s steps(2);
+}
+
+.portrait-container:hover .pixel-img {
+    filter: drop-shadow(8px 8px 0px rgba(255, 0, 255, 0.6));
+}
+
+#personName {
+    margin-top: 30px;
+    font-size: 48px;
+    text-shadow: 4px 4px 0px #000, 0 0 10px rgba(0, 255, 255, 0.6);
+    text-align: center; /* Metni tam ortala */
+    word-wrap: break-word; /* Çok uzunsa alt satıra indir */
+    max-width: 100%; /* Konteynerden dışarı taşmasını engelle */
+    line-height: 1.4; /* Satırlar arası boşluk */
+}
+
+/* --- OPTİMİZE EDİLMİŞ KARE KARE GEÇİŞLER --- */
+/* Kasmasın diye ağır renk filtreleri (contrast/brightness) çıkarıldı, sadece yok olma eklendi */
+.wipe-out-left { animation: glitchOutLeft 0.4s steps(8) forwards; }
+.wipe-in-right { animation: glitchInRight 0.4s steps(8) forwards; }
+.wipe-out-right { animation: glitchOutRight 0.4s steps(8) forwards; }
+.wipe-in-left { animation: glitchInLeft 0.4s steps(8) forwards; }
+
+@keyframes glitchOutLeft {
+    0% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(-100vw); opacity: 0; }
+}
+@keyframes glitchInRight {
+    0% { transform: translateX(100vw); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes glitchOutRight {
+    0% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(100vw); opacity: 0; }
+}
+@keyframes glitchInLeft {
+    0% { transform: translateX(-100vw); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+/* --- NAVİGASYON VE BİLGİ KARTI --- */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #0ff;
+    font-size: 70px;
+    cursor: pointer;
+    padding: 30px;
+    z-index: 10;
+    text-shadow: 0 0 10px #0ff;
+}
+#prevBtn { left: 30px; }
+#nextBtn { right: 30px; }
+.nav-btn:hover { color: #f0f; text-shadow: 0 0 15px #f0f; }
+
+.click-hint { margin-top: 15px; font-size: 16px; color: #f0f; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+.info-card-section {
+    width: 0%; opacity: 0; background-color: rgba(43, 27, 66, 0.95); /* Arka plana uyumlu mor kart */
+    border-left: 8px solid #0ff; box-shadow: -10px 0 20px rgba(0, 255, 255, 0.2);
+    padding: 80px; position: absolute; right: 0; height: 100%;
+    display: flex; flex-direction: column; transition: all 0.5s steps(10); overflow: hidden;
+}
+
+/* Detay Modunda Sol Taraf (Resim) */
+.full-screen-container.detail-mode .slider-section { 
+    width: 45%; /* Sola %45'lik güzel bir alan ayırdık */
+    transform: translateX(0); /* O aşırı sola kaymayı İPTAL ETTİK */
+}
+
+/* Detay Modunda Sağ Taraf (Kart) */
+.full-screen-container.detail-mode .info-card-section { 
+    width: 55%; 
+    opacity: 1; 
+}
+
+/* Detay modunda butonları ve yazıyı gizle */
+.full-screen-container.detail-mode .nav-btn, 
+.full-screen-container.detail-mode .click-hint { 
+    display: none; 
+}
+
+/* YENİ: Detay modunda o uzun lakaplar sığsın diye fontu biraz küçültüyoruz */
+.full-screen-container.detail-mode #personName {
+    font-size: 26px; 
+    margin-top: 15px;
+}
+
+.back-btn { background-color: #f0f; color: white; border: 4px solid #fff; cursor: pointer; padding: 15px 25px; font-size: 16px; margin-bottom: 30px; }
+.back-btn:hover { background-color: #0ff; color: black; }   
+
+/* --- KOCAMAN PIXEL AY --- */
+.pixel-moon {
+    position: absolute;
+    top: 5vh;
+    right: 12vw;
+    width: 180px; /* Kocaman yaptık */
+    height: 180px;
+    background-color: #e0e6ed; /* Güneş gibi sarı değil, Ay gibi beyaz/gri */
+    
+    /* Köşeleri kırpıp pixel daire şekli veriyoruz */
+    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+    
+    /* Ayın karanlık yüzü ve efsane beyaz/mavi parlama */
+    box-shadow: 
+        inset -25px -25px 0 0 rgba(0,0,0,0.15),
+        0 0 60px 15px rgba(200, 230, 255, 0.4);
+    z-index: 2;
+}
+
+/* Ayın üzerindeki pixel kraterler */
+.pixel-moon::before, .pixel-moon::after {
+    content: '';
+    position: absolute;
+    background-color: #b0c4de;
+}
+
+.pixel-moon::before {
+    width: 40px; height: 40px;
+    top: 30px; left: 40px;
+    box-shadow: 60px 70px 0 -10px #b0c4de; /* İkinci krater */
+}
+
+.pixel-moon::after {
+    width: 25px; height: 25px;
+    bottom: 40px; left: 30px;
+}
+
+/* --- ÇİZGİLİ NEON KUYRUKLU YILDIZLAR --- */
+/* --- ÇİZGİLİ NEON KUYRUKLU YILDIZLAR --- */
+.shooting-stars-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.shooting-star {
+    position: absolute;
+    width: 150px; /* Çok abartılı olmasın, zarif dursun */
+    height: 4px;
+    border-radius: 10px;
+    transform-origin: right center; /* Yıldızın kafası sağda, oradan yön alacak */
+    
+    /* Animasyon süresini artık JS'den (duration) alıyoruz */
+    animation: shootStar var(--duration) ease-out forwards;
+    will-change: transform, opacity;
+}
+
+/* YENİ FİZİK KURALLARI: Parlak başla, yavaşça sönerek in */
+@keyframes shootStar {
+    0% {
+        transform: rotate(var(--angle)) translateX(0) scaleX(1);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1; /* Gökyüzünde parlak bir şekilde belirir */
+    }
+    100% {
+        /* Belirlenen açıya doğru (aşağı) uzun bir mesafe kayar, küçülür ve söner */
+        transform: rotate(var(--angle)) translateX(100vw) scaleX(0.1);
+        opacity: 0; 
+    }
+}
+
+
+/* --- %100 KOD İLE ÇİZİLEN GECE GÖKYÜZÜ --- */
+
+/* Koyu Lacivert/Mor Degrade Gökyüzü */
+.css-sky {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(180deg, #0b0c10 0%, #1f2833 50%, #2b1b42 100%);
+    z-index: 0;
+}
+
+/* Yanıp Sönen Yıldızlar (Tek div ile yüzlerce yıldız illüzyonu) */
+.css-stars {
+    position: absolute;
+    top: 0; left: 0; width: 4px; height: 4px;
+    background: transparent;
+    box-shadow: 
+        10vw 10vh #fff, 20vw 25vh #fff, 30vw 5vh #fff, 45vw 35vh #fff, 
+        60vw 15vh #fff, 75vw 40vh #fff, 90vw 10vh #fff, 15vw 50vh #fff,
+        35vw 60vh #fff, 50vw 20vh #fff, 65vw 55vh #fff, 85vw 30vh #fff,
+        5vw 80vh #fff, 25vw 70vh #fff, 80vw 80vh #fff, 95vw 65vh #fff,
+        12vw 30vh #fff, 40vw 45vh #fff, 70vw 25vh #fff, 88vw 50vh #fff;
+    
+    /* Etraflarına beyaz bir hale ekleyerek daha parlak görünmelerini sağlıyoruz */
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 1));
+    
+    /* steps yerine ease-in-out kullanarak yumuşakça parlayıp sönmesini sağladık */
+    animation: twinkleStars 1.2s ease-in-out infinite alternate;
+    z-index: 1;
+}
+
+@keyframes twinkleStars {
+    0% { 
+        opacity: 0.1; /* Neredeyse tamamen sönük */
+    }
+    100% { 
+        opacity: 1; /* Tamamen parlak */
+    }
+}
+/* Kod ile Çizilen Hilal Ay */
+.css-moon {
+    position: absolute;
+    top: 8vh;      /* Biraz daha yukarı aldım */
+    right: 10vw;    /* Sol yerine Sağdan (right) pay verdim */
+    left: auto;    /* Eğer önceden left varsa iptal eder */
+    width: 120px;
+    height: 120px;
+    background-color: transparent;
+    border-radius: 50%;
+    box-shadow: -18px 8px 0 0 #e0e6ed;
+    filter: drop-shadow(0 0 20px rgba(224, 230, 237, 0.6)); /* Parlamayı biraz artırdım */
+    z-index: 2;
+    animation: bobMoon 5s ease-in-out infinite alternate;
+}
+
+@keyframes bobMoon {
+    0% { transform: translateY(-15px); }
+    100% { transform: translateY(15px); }
+}
+
+/* Kod ile Çizilen Sağa Sola Kayan Bulutlar */
+.css-clouds {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Bulutun temel yapısı (Kutu gölgeleri ile pixel bulut şekli) */
+.css-cloud {
+    position: absolute;
+    background-color: #3b2f5b; /* Mor bulut rengi */
+    width: 60px; height: 20px;
+    box-shadow: 
+        30px -20px 0 0 #3b2f5b,
+        60px -20px 0 0 #3b2f5b,
+        90px 0 0 0 #3b2f5b,
+        120px 0 0 0 #3b2f5b,
+        30px 20px 0 0 #3b2f5b,
+        60px 20px 0 0 #3b2f5b,
+        -30px 0 0 0 #3b2f5b;
+}
+
+/* Bulutların konumları ve yavaş kayma animasyonları */
+.cloud-1 { top: 25vh; left: 10vw; animation: floatCloud1 15s linear infinite alternate; }
+.cloud-2 { top: 45vh; left: 65vw; animation: floatCloud2 20s linear infinite alternate; transform: scale(1.5); opacity: 0.8; }
+.cloud-3 { top: 15vh; left: 80vw; animation: floatCloud1 12s linear infinite alternate-reverse; transform: scale(0.7); opacity: 0.6; }
+.cloud-4 { top: 60vh; left: 20vw; animation: floatCloud2 18s linear infinite alternate-reverse; transform: scale(1.2); opacity: 0.7; }
+
+@keyframes floatCloud1 {
+    0% { transform: translateX(-40px); }
+    100% { transform: translateX(40px); }
+}
+
+@keyframes floatCloud2 {
+    0% { transform: translateX(-60px) scale(1.5); }
+    100% { transform: translateX(60px) scale(1.5); }
+}
+
+
+/* --- YAĞMUR EFEKTİ --- */
+.rain-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5; /* Işığın önünde durması için 5 yaptık */
+    pointer-events: none; 
+    overflow: hidden;
+    contain: strict;
+}
+
+.raindrop {
+    position: absolute;
+    width: 2px; /* Pixel art tarzı ince damlalar */
+   /*background: linear-gradient(transparent, rgba(0, 0, 0, 1));*/
+   background: linear-gradient(transparent, var(--rain-color));
+    bottom: 100%; /* Ekranın en üstünden (hatta dışından) başlasın */
+    /* Kasma yapmaması için GPU hızlandırma */
+    will-change: transform;
+    /* Düşüş animasyonu */
+    animation: rainFall linear infinite;
+    will-change: transform;
+    transform: translateZ(0); /* YENİ: GPU Hızlandırması */
+}
+
+@keyframes rainFall {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(120vh); } /* Ekranın en altına kadar düşsün */
+}
+
+
+
+/* --- GERÇEKÇİ ÇAPRAZ KAYAN YILDIZ VE DEV AYDINLATMA --- */
+
+/* 1. KAYAN YILDIZ KATMANI (Derinlik yağmurun arkasında) */
+.shooting-stars-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2; /* Işığın yağmurun arkasında kalmasını sağlar (silüet efekti) */
+    pointer-events: none;
+    overflow: hidden;
+    contain: strict;
+}
+
+/* 2. KAYAN YILDIZIN KENDİSİ VE KÜÇÜK, RETRO HALOSU */
+.shooting-star {
+    position: absolute;
+    width: 6px; 
+    height: 6px;
+    background-color: #fff;
+    border-radius: 50%;
+    
+    /* Işığı buradan sildik, döndürülmemiş yeni bir katmana taşıyacağız! */
+    
+    transform: rotate(45deg);
+    will-change: transform, opacity;
+}
+
+/* ÇEVREYİ VE YAĞMURU AYDINLATAN GENİŞ IŞIK (YENİ EKLENDİ) */
+.shooting-star::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    
+    /* EFSANE TAKTİK: Ana yıldız 45 derece dönükken, biz ışığı -45 derece 
+       döndürerek düzeltiyoruz. Böylece ışık kare kare kesilmiyor! */
+    transform: translate(-50%, -50%) rotate(-45deg);
+
+    /* Artık kareleşme korkusu olmadan çevreyi aydınlatacak o devasa retro ışığı verebiliriz */
+    box-shadow:
+        0 0 20px 10px rgba(255, 255, 255, 0.9),   /* Merkez parlaklığı */
+        0 0 60px 30px rgba(255, 255, 255, 0.5),   /* Orta yayılım */
+        0 0 140px 70px rgba(200, 230, 255, 0.25); /* Yağmuru silüet yapacak dev loş alan */
+}
+
+/* Kayan Yıldızın Kuyruğu */
+.shooting-star::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 180px; 
+    height: 2px;
+    background: linear-gradient(to left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.4) 30%, transparent 100%);
+}
+/* Çapraz Düşüş Animasyonu */
+@keyframes shootLocal {
+    0% {
+        transform: rotate(45deg) translateX(-10vw);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1; /* Parlayarak ekrana girer */
+    }
+    50% {
+        opacity: 0.8; /* Gücünü kaybetmeye başlar */
+    }
+    100% {
+        /* Ekranın sonunda sönmüş olur */
+        transform: rotate(45deg) translateX(120vw);
+        opacity: 0;
+    }
+}
+
+/* --- YENİ EKLENEN ARAYÜZ ELEMANLARI İÇİN CSS --- */
+
+/* Ben Kimim (Yazar) Seçicisi */
+.author-selector-container {
+    position: absolute; top: 25px; left: 30px; z-index: 50;
+    background-color: rgba(43, 27, 66, 0.8); border: 2px solid #0ff;
+    padding: 15px; display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4); transition: opacity 0.3s ease;
+}
+.full-screen-container.detail-mode .author-selector-container {
+    opacity: 0; pointer-events: none;
+}
+.author-selector-container label { font-size: 10px; color: #f0f; text-shadow: 1px 1px 0px #000; }
+.pixel-select {
+    background-color: #100820; color: #0ff; border: 1px solid #0ff;
+    padding: 8px; font-size: 12px; cursor: pointer; outline: none; font-family: 'Press Start 2P', cursive;
+}
+
+/* Yorum Yazma Kutusu (Textarea) */
+.pixel-textarea {
+    width: 100%; height: 200px; background-color: rgba(0,0,0,0.6);
+    color: #fff; border: 2px solid #f0f; padding: 15px;
+    font-family: 'Press Start 2P', cursive; font-size: 14px;
+    resize: vertical; outline: none; line-height: 1.6;
+    box-shadow: inset 0 0 10px rgba(255, 0, 255, 0.2);
+}
+
+/* Neon Butonlar */
+.pixel-btn {
+    background-color: #100820; color: #0ff; border: 2px solid #0ff;
+    padding: 12px 15px; font-size: 12px; cursor: pointer;
+    font-family: 'Press Start 2P', cursive; transition: all 0.2s;
+    text-shadow: 1px 1px 0px #000;
+}
+.pixel-btn:hover { background-color: #0ff; color: #100820; text-shadow: none; }
+.save-btn { border-color: #0f0; color: #0f0; }
+.save-btn:hover { background-color: #0f0; color: #100820; }
+.cancel-btn { border-color: #f00; color: #f00; }
+.cancel-btn:hover { background-color: #f00; color: #100820; }
+
+
+/* --- YENİ EKLENEN LAKAP KUTUSU İÇİN CSS --- */
+.pixel-input {
+    background-color: rgba(0,0,0,0.6); 
+    color: #0ff; 
+    border: 2px solid #0ff; 
+    padding: 12px; 
+    font-family: 'Press Start 2P', cursive; 
+    font-size: 12px;
+    outline: none; 
+    box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.2);
+}
+.pixel-input::placeholder {
+    color: rgba(0, 255, 255, 0.5);
+}
+
+.music-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.pixel-btn {
+    background: #222;
+    color: white;
+    border: 4px solid #444;
+    padding: 10px;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace; /* Veya kullandığın pixel fontu */
+    box-shadow: 4px 4px 0px #000;
+}
+
+.pixel-btn:active {
+    box-shadow: 0px 0px 0px #000;
+    transform: translate(4px, 4px);
+}
+
+
+/* Yağmur damlası çarpma efekti */
+.rain-splash {
+    position: fixed;
+    pointer-events: none; /* Tıklamaları engellemez */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px); /* Arkayı bulanıklaştıran sihirli dokunuş */
+    transform: scale(0);
+    animation: splash-anim 0.6s ease-out forwards;
+    z-index: 9999;
+}
+
+@keyframes splash-anim {
+    0% {
+        transform: scale(0);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.5); /* Büyüyerek kaybolur */
+        opacity: 0;
+    }
+}
+
+/* RPG İstatistik Stilleri */
+.stats-container {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+}
+
+.stat-bar-bg {
+    flex-grow: 1;
+    height: 12px;
+    background: #000;
+    border: 2px solid #fff;
+    position: relative;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f0f, #0ff);
+    width: 0%;
+    transition: width 0.5s steps(10);
+}
+
+.stats-edit-container {
+    background: rgba(0,0,0,0.5);
+    padding: 15px;
+    border: 2px solid #f0f;
+    margin-bottom: 15px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 10px;
+}
+
+.stat-row input[type="range"] {
+    cursor: pointer;
+    accent-color: #0ff;
+}
+
+
+/* =========================================
+   DİNAMİK GÖKYÜZÜ TEMALARI (GÜNDÜZ & GÜN BATIMI)
+   ========================================= */
+
+/* --- GÜNDÜZ (06:00 - 17:00) --- */
+.theme-day {
+    background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+}
+.theme-day .css-sky {
+    background: linear-gradient(180deg, #4facfe 0%, #76d5ff 50%, #c4eaff 100%);
+}
+.theme-day .css-stars, 
+.theme-day .shooting-stars-layer {
+    opacity: 0; /* Gündüz yıldızlar görünmez */
+}
+.theme-day .css-moon {
+    /* Ayı Güneş'e Çeviriyoruz */
+    background-color: #ffde00;
+    box-shadow: 0 0 40px #ffde00; /* Hilal gölgesini silip parlama verdik */
+    filter: drop-shadow(0 0 20px rgba(255, 222, 0, 0.8));
+    top: 10vh;
+}
+.theme-day .css-cloud {
+    /* Gündüz bembeyaz bulutlar */
+    background-color: #ffffff;
+    box-shadow: 
+        30px -20px 0 0 #ffffff, 60px -20px 0 0 #ffffff, 
+        90px 0 0 0 #ffffff, 120px 0 0 0 #ffffff, 
+        30px 20px 0 0 #ffffff, 60px 20px 0 0 #ffffff, 
+        -30px 0 0 0 #ffffff;
+    opacity: 0.9 !important;
+}
+
+/* --- GÜN BATIMI / LO-FI AKŞAMÜSTÜ (17:00 - 20:00) --- */
+.theme-sunset {
+    background: linear-gradient(180deg, #ff7b54 0%, #2b1b42 100%);
+}
+.theme-sunset .css-sky {
+    background: linear-gradient(180deg, #ff7b54 0%, #ffb26b 40%, #c26565 100%);
+}
+.theme-sunset .css-stars {
+    opacity: 0.3; /* Yıldızlar yavaş yavaş beliriyor */
+}
+.theme-sunset .css-moon {
+    /* Batan Kızıl Güneş */
+    background-color: #ff5722;
+    box-shadow: 0 0 50px #ff5722;
+    filter: drop-shadow(0 0 20px rgba(255, 87, 34, 0.8));
+    top: 40vh; /* Güneş aşağıya (ufka) iniyor */
+    transform: scale(1.5); /* Ufukta güneş daha büyük görünür */
+}
+.theme-sunset .css-cloud {
+    /* Gün batımı kızıllığı vuran bulutlar */
+    background-color: #ff9a76;
+    box-shadow: 
+        30px -20px 0 0 #ff9a76, 60px -20px 0 0 #ff9a76, 
+        90px 0 0 0 #ff9a76, 120px 0 0 0 #ff9a76, 
+        30px 20px 0 0 #ff9a76, 60px 20px 0 0 #ff9a76, 
+        -30px 0 0 0 #ff9a76;
+}
+
+
+
+
+
+
+
+
+/* =========================================
+   SOKAK LAMBASI (STREETLAMP) 
+   ========================================= */
+:root {
+    --pole-dark: #1e2635;
+    --pole-light: #233451;
+}
+
+.streetlamp {
+    width: 80px;
+    height: 72vh;
+    position: absolute;
+    right: 18vw;
+    bottom: 37vh; /* Ekranın altından başlasın */
+  /* 3. KÜÇÜLTME: Lambayı ve o koca ışığı bozmadan %60 oranında küçültüyoruz */
+    transform: scale(0.25); 
+    transform-origin: bottom center; /* Küçülürken havada kalmasın, tabanı yere basmaya devam etsin */
+    
+    z-index: 3; /* Neon ızgaranın önünde, ama karakterin ve menülerin arkasında kalsın */
+}
+
+.base {
+    bottom: 0; right: 0; position: absolute; width: 81%; height: 24%;
+    background: linear-gradient(-94deg, var(--pole-dark) 0 23%, transparent calc(23% + 1px) 100%), 
+                linear-gradient(-1deg, var(--pole-dark) 0 3.65%, transparent calc(1.65% + 1px) 100%), 
+                linear-gradient(85deg, var(--pole-dark) 0 58%, var(--pole-light) calc(58% + 1px) 100%);
+    border-radius: 2px;
+    clip-path: polygon(15% 0, 76% 0, 95% 99%, 0% 99%);
+    z-index: 1;
+}
+
+.basetop {
+    background: #1e2634; width: 75%; height: 3%; position: absolute;
+    bottom: 24%; left: 16%; border-radius: 2px; z-index: 2; transform: rotate(-0.5deg);
+}
+
+.pole {
+    position: absolute; width: 25%; height: 56.5%;
+    background: linear-gradient(-1deg, var(--pole-dark) 0 1.65%, transparent calc(1.65% + 1px) 100%), 
+                linear-gradient(-91deg, var(--pole-dark) 0 35%, transparent calc(35% + 1px) 100%), 
+                linear-gradient(89.5deg, var(--pole-dark) 0 40%, var(--pole-light) calc(40% + 1px) 100%);
+    bottom: 26.25%; left: 45%;
+    clip-path: polygon(17% 0, 60% 0, 95% 99%, 0% 99%); z-index: 1;
+}
+
+.poletop {
+    width: 20%; height: 1.5%; background: var(--pole-dark); position: absolute;
+    bottom: 82%; left: 44%; z-index: 1; clip-path: polygon(0% 0, 100% 0, 95% 65%, 10% 72%);
+}
+
+.head { position: absolute; width: 100%; height: 100px; bottom: 83%; z-index: 1; }
+
+.head .top {
+    background: conic-gradient(from 131deg at 55% 0, var(--pole-light) 0 12%, var(--pole-dark) 13% 29.5%, transparent 0 100%);
+    width: 100%; height: 30%; top: 20%; position: absolute; transform: rotate(-3deg);
+}
+
+.head .bot {
+    width: 75%; height: 5%;
+    background: linear-gradient(45deg, transparent 12%, var(--pole-dark) 0 65%, transparent 0 100%), 
+                linear-gradient(-50deg, transparent 8%, var(--pole-dark) 0 65%, transparent 0 100%);
+    left: 17%; position: absolute; bottom: 1%; transform: rotate(-3deg);
+}
+
+.top:before {
+    content: ""; position: absolute; background: var(--pole-light);
+    width: 8px; height: 12px; border-radius: 100%; left: 48%; top: -40%;
+    border: 3px solid var(--pole-dark); border-left-width: 0;
+}
+.top:after {
+    content: ""; position: absolute; background: var(--pole-dark);
+    width: 4px; height: 12px; border-radius: 100%; left: 52%; top: -70%;
+}
+
+.glass {
+    background: linear-gradient(-79deg, transparent 0 12%, var(--pole-dark) 13% 16%, transparent 17% 100%), 
+                conic-gradient(from -46deg at 53% 200%, transparent 0 13%, var(--pole-dark) 13.2% 14%, transparent 14.2% 100%), 
+                linear-gradient(70deg, transparent 0 21%, var(--pole-dark) 22% 25%, transparent 26% 100%), 
+                radial-gradient(circle at 37% 250%, transparent 0 73%, #e4ce8b 75% 100%), 
+                radial-gradient(circle at 37% 300%, transparent 0 73%, #e4ce8b 75% 100%), 
+                conic-gradient(from -46deg at 53% 200%, transparent 0 7%, #f5f3b0 0 13%, var(--pole-dark) 13.2% 14%, transparent 14.2% 100%), 
+                linear-gradient(-79deg, transparent 0 12%, var(--pole-dark) 13% 16%, #ffe5ad 17% 50%, transparent 17% 100%);
+    background-repeat: no-repeat; background-size: 100% 100%, 100% 100%, 100% 100%, 33% 42%, 50% 35%, 100% 100%;
+    background-position: 0 0, 0 0, 0 0, 90% 0, 20% 0, 0 0;
+    width: 100%; height: 45%; top: 50%; position: absolute; transform: rotate(-3deg);
+    opacity: 0.5;
+}
+
+.light {
+    background: linear-gradient(180deg, #dac47080, #dac47020 90%, transparent 100%);
+    width: 650px; height: 64vh; position: absolute; left: -274px; bottom: 1.5%;
+    clip-path: polygon(43% 1%, 53% 0.35%, 100% 100%, 0 100%);
+    opacity: 0;
+}
+
+.ground-light {
+    background: #dac47080; width: 650px; left: -275px; position: absolute;
+    bottom: -28px; height: 80px; border-radius: 100%; z-index: 0;
+    opacity: 0;
+}
+
+/* SADECE GECE MODU AKTİFKEN IŞIKLARI YAK */
+.streetlamp.lamp-on .light,
+.streetlamp.lamp-on .ground-light,
+.streetlamp.lamp-on .head .glass {
+    animation: turn-on 2s ease 0s 1;
+    opacity: 1;
+}
+
+@keyframes turn-on {
+    0%, 10%, 25% { opacity: 0; }
+    5%, 15%, 35%, 100% { opacity: 1; }
+}
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+   1. SOKAK LAMBASI (STREETLAMP) 
+   ========================================= */
+:root {
+    --pole-dark: #1e2635;
+    --pole-light: #233451;
+}
+
+.streetlamp {
+    width: 80px;
+    height: 72vh;
+    position: absolute;
+    right: 18vw;
+    bottom: 37vh; 
+    transform: scale(0.25); 
+    transform-origin: bottom center; 
+    z-index: 3; 
+}
+
+.base {
+    bottom: 0; right: 0; position: absolute; width: 81%; height: 24%;
+    background: linear-gradient(-94deg, var(--pole-dark) 0 23%, transparent calc(23% + 1px) 100%), 
+                linear-gradient(-1deg, var(--pole-dark) 0 3.65%, transparent calc(1.65% + 1px) 100%), 
+                linear-gradient(85deg, var(--pole-dark) 0 58%, var(--pole-light) calc(58% + 1px) 100%);
+    border-radius: 2px;
+    clip-path: polygon(15% 0, 76% 0, 95% 99%, 0% 99%);
+    z-index: 1;
+}
+
+.basetop { background: #1e2634; width: 75%; height: 3%; position: absolute; bottom: 24%; left: 16%; border-radius: 2px; z-index: 2; transform: rotate(-0.5deg); }
+.pole { position: absolute; width: 25%; height: 56.5%; background: linear-gradient(-1deg, var(--pole-dark) 0 1.65%, transparent calc(1.65% + 1px) 100%), linear-gradient(-91deg, var(--pole-dark) 0 35%, transparent calc(35% + 1px) 100%), linear-gradient(89.5deg, var(--pole-dark) 0 40%, var(--pole-light) calc(40% + 1px) 100%); bottom: 26.25%; left: 45%; clip-path: polygon(17% 0, 60% 0, 95% 99%, 0% 99%); z-index: 1; }
+.poletop { width: 20%; height: 1.5%; background: var(--pole-dark); position: absolute; bottom: 82%; left: 44%; z-index: 1; clip-path: polygon(0% 0, 100% 0, 95% 65%, 10% 72%); }
+.head { position: absolute; width: 100%; height: 100px; bottom: 83%; z-index: 1; }
+.head .top { background: conic-gradient(from 131deg at 55% 0, var(--pole-light) 0 12%, var(--pole-dark) 13% 29.5%, transparent 0 100%); width: 100%; height: 30%; top: 20%; position: absolute; transform: rotate(-3deg); }
+.head .bot { width: 75%; height: 5%; background: linear-gradient(45deg, transparent 12%, var(--pole-dark) 0 65%, transparent 0 100%), linear-gradient(-50deg, transparent 8%, var(--pole-dark) 0 65%, transparent 0 100%); left: 17%; position: absolute; bottom: 1%; transform: rotate(-3deg); }
+.top:before { content: ""; position: absolute; background: var(--pole-light); width: 8px; height: 12px; border-radius: 100%; left: 48%; top: -40%; border: 3px solid var(--pole-dark); border-left-width: 0; }
+.top:after { content: ""; position: absolute; background: var(--pole-dark); width: 4px; height: 12px; border-radius: 100%; left: 52%; top: -70%; }
+.glass { background: linear-gradient(-79deg, transparent 0 12%, var(--pole-dark) 13% 16%, transparent 17% 100%), conic-gradient(from -46deg at 53% 200%, transparent 0 13%, var(--pole-dark) 13.2% 14%, transparent 14.2% 100%), linear-gradient(70deg, transparent 0 21%, var(--pole-dark) 22% 25%, transparent 26% 100%), radial-gradient(circle at 37% 250%, transparent 0 73%, #e4ce8b 75% 100%), radial-gradient(circle at 37% 300%, transparent 0 73%, #e4ce8b 75% 100%), conic-gradient(from -46deg at 53% 200%, transparent 0 7%, #f5f3b0 0 13%, var(--pole-dark) 13.2% 14%, transparent 14.2% 100%), linear-gradient(-79deg, transparent 0 12%, var(--pole-dark) 13% 16%, #ffe5ad 17% 50%, transparent 17% 100%); background-repeat: no-repeat; background-size: 100% 100%, 100% 100%, 100% 100%, 33% 42%, 50% 35%, 100% 100%; background-position: 0 0, 0 0, 0 0, 90% 0, 20% 0, 0 0; width: 100%; height: 45%; top: 50%; position: absolute; transform: rotate(-3deg); opacity: 0.5; }
+.light { background: linear-gradient(180deg, #dac47080, #dac47020 90%, transparent 100%); width: 650px; height: 64vh; position: absolute; left: -274px; bottom: 1.5%; clip-path: polygon(43% 1%, 53% 0.35%, 100% 100%, 0 100%); opacity: 0; }
+.ground-light { background: #dac47080; width: 650px; left: -275px; position: absolute; bottom: -28px; height: 80px; border-radius: 100%; z-index: 0; opacity: 0; }
+
+.streetlamp.lamp-on .light, .streetlamp.lamp-on .ground-light, .streetlamp.lamp-on .head .glass { animation: turn-on 2s ease 0s 1; opacity: 1; }
+@keyframes turn-on { 0%, 10%, 25% { opacity: 0; } 5%, 15%, 35%, 100% { opacity: 1; } }
+
+/* =========================================
+   2. GÜVENLİ TIKLAMA ALANI (SİTEYİ BOZMAZ)
+   ========================================= */
+.lamp-hitbox {
+    position: absolute;
+    right: 16vw; 
+    bottom: 37vh;
+    width: 100px;
+    height: 250px;
+    cursor: pointer;
+    z-index: 100; /* Görünmez ama tıklanabilir kutu */
+}
+
+/* =========================================
+   3. GÜVENLİ KEDİ (IŞIĞIN ALTINDA)
+   ========================================= */
+.lamp-cat-container {
+    position: absolute;
+    bottom: -10px; 
+    left: -150px; 
+    transform: scale(0.8) translateX(-150px); 
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease, transform 1.5s ease-out;
+    z-index: 5;
+}
+
+.streetlamp.show-animals .lamp-cat-container {
+    opacity: 1;
+    transform: scale(0.8) translateX(0px); 
+}
+
+/* Kedinin özel çizimi */
+.my-cat { position: relative; }
+.cat-face { background-color: #111; height: 100px; width: 150px; border-radius: 30px; } 
+.cat-ear-l, .cat-ear-r { width: 0; height: 0; border-bottom: 50px solid #111; border-left: 20px solid transparent; border-right: 20px solid transparent; position: relative; z-index: -1; }
+.cat-ear-l { bottom: 35px; transform: rotate(-30deg); }
+.cat-ear-r { bottom: 85px; left: 110px; transform: rotate(30deg); }
+.cat-inner-l { width: 0; height: 0; border-bottom: 50px solid #333; border-left: 25px solid transparent; right: 25px; position: relative; }
+.cat-inner-r { width: 0; height: 0; border-bottom: 50px solid #333; border-right: 25px solid transparent; position: relative; }
+.cat-eye-l, .cat-eye-r { background-color: #ffd844; height: 30px; width: 30px; border-radius: 50%; position: relative; } 
+.cat-eye-l { bottom: 75px; left: 30px; }
+.cat-eye-r { bottom: 105px; left: 90px; }
+.cat-eyeball { background-color: #111; height: 24px; width: 6px; border-radius: 50%; position: relative; top: 3px; left: 12px; } 
+.cat-nose { height: 0; width: 0; border-top: 8px solid #d36149; border-left: 7px solid transparent; border-right: 7px solid transparent; position: relative; bottom: 110px; left: 68px; }
+.cat-l1, .cat-l2 { background-color: #d36149; height: 8px; width: 1px; position: relative; }
+.cat-l1 { transform: rotate(45deg); right: 4px; bottom: 1.5px; }
+.cat-l2 { transform: rotate(-45deg); bottom: 10px; left: 3px; }
+.cat-body-part { background-color: #111; height: 120px; width: 150px; position: relative; left: 30px; border-radius: 0 65px 0 0; z-index: -2; }
+.cat-paw-1, .cat-paw-2 { background-color: #111; height: 10px; width: 22px; position: relative; border-radius: 0 0 10px 10px; }
+.cat-paw-1 { top: 120px; }
+.cat-paw-2 { top: 110px; left: 50px; }
+.cat-tail { background-color: #111; width: 100px; height: 20px; position: relative; top: 80px; left: 100px; border-radius: 0 20px 20px 0; animation: tail-wag 2s infinite alternate; transform-origin: left center;}
+
+@keyframes tail-wag { 0% { transform: rotate(10deg); } 100% { transform: rotate(-20deg); } }
+
+/* =========================================
+   4. BEMBEYAZ UÇAN KUŞLAR
+   ========================================= */
+.birds-sky-layer {
+    position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none; z-index: 50; opacity: 0; transition: opacity 1s ease;
+}
+
+body.show-birds-layer .birds-sky-layer { opacity: 1; }
+
+.bird {
+    background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/174479/bird-cells-new.svg');
+    filter: invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+    background-size: auto 100%; width: 88px; height: 125px;
+    will-change: background-position;
+    animation-name: fly-cycle; animation-timing-function: steps(10); animation-iteration-count: infinite;
+}
+
+.bird-one { animation-duration: 1s; animation-delay: -0.5s; }
+.bird-two { animation-duration: 0.9s; animation-delay: -0.75s; }
+.bird-three { animation-duration: 1.25s; animation-delay: -0.25s; }
+
+.bird-container {
+    position: absolute; top: 10%; left: -10vw;
+    transform: scale(0) translateX(-10vw);
+    will-change: transform;
+    animation-name: fly-right-one; animation-timing-function: linear; animation-iteration-count: infinite;
+    animation-play-state: paused; 
+}
+
+body.show-birds-layer .bird-container { animation-play-state: running; }
+
+.bird-container-one { animation-duration: 15s; animation-delay: 0; }
+.bird-container-two { animation-duration: 16s; animation-delay: 1s; }
+.bird-container-three { animation-duration: 14.6s; animation-delay: 9.5s; }
+
+@keyframes fly-cycle { 100% { background-position: -900px 0; } }
+@keyframes fly-right-one {
+    0% { transform: scale(0.3) translateX(-10vw); }
+    10% { transform: translateY(2vh) translateX(10vw) scale(0.4); }
+    20% { transform: translateY(0vh) translateX(30vw) scale(0.5); }
+    30% { transform: translateY(4vh) translateX(50vw) scale(0.6); }
+    40% { transform: translateY(2vh) translateX(70vw) scale(0.6); }
+    50% { transform: translateY(0vh) translateX(90vw) scale(0.6); }
+    60% { transform: translateY(0vh) translateX(110vw) scale(0.6); }
+    100% { transform: translateY(0vh) translateX(110vw) scale(0.6); }
+}
+
+
+
+/* =========================================
+   VS MODU ARENASI VE ANİMASYONLAR
+   ========================================= */
+
+.vs-btn-container { 
+    position: fixed; 
+    top: 80px;  /* Müzik butonunun altına inmesi için */
+    right: 20px; /* Sağ üst köşe */
+    z-index: 1000; 
+    display: flex;
+    flex-direction: column; /* İçindeki butonları alt alta dizer */
+    gap: 15px; /* Butonların arasına 15px boşluk bırakır */
+}
+/* Arena Arka Planı (Gizli başlar) */
+.vs-arena-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85); /* Arkayı hafif gösteren siyah ekran */
+    backdrop-filter: blur(5px);
+    z-index: 9999; display: none; justify-content: center; align-items: center;
+}
+.vs-arena-overlay.active { display: flex; }
+
+.vs-arena-content {
+    background: #100820; border: 4px solid #f0f;
+    padding: 30px; border-radius: 10px; width: 90%; max-width: 1000px;
+    box-shadow: 0 0 30px rgba(255, 0, 255, 0.4); text-align: center; position: relative;
+}
+
+.close-vs { position: absolute; top: -20px; right: -20px; background: #f00; border-color: #fff; color: #fff; }
+.vs-title { color: #0ff; font-size: 24px; margin-bottom: 30px; text-shadow: 2px 2px 0px #000; }
+
+/* Savaş Alanı Düzeni */
+.battlefield { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+
+.fighter-card { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 30%; }
+.fighter-img { height: 200px; filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5)); transition: transform 0.2s; }
+.fighter-img.shake { animation: shake 0.3s; filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.8)); }
+
+/* Can Barları (HP) */
+.hp-container { width: 100%; background: #222; border: 2px solid #fff; height: 20px; position: relative; }
+.hp-bar { width: 100%; height: 100%; background: #0f0; transition: width 0.3s ease, background-color 0.3s ease; }
+.hp-text { position: absolute; width: 100%; text-align: center; top: 2px; left: 0; font-size: 10px; color: #000; font-weight: bold; }
+
+/* Orta Kısım */
+.battle-center { width: 30%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.vs-logo { font-size: 50px; color: #f0f; text-shadow: 4px 4px 0px #000, 0 0 20px #f0f; }
+.battle-log { background: rgba(0,0,0,0.5); border: 1px solid #0ff; padding: 15px; font-size: 12px; color: #fff; width: 100%; min-height: 50px; line-height: 1.5; }
+.attack-btn { font-size: 16px; padding: 15px; background: #f00; border-color: #fff; color: #fff; animation: pulse 1.5s infinite; }
+
+/* --- KIRMIZI HASAR ÇİZGİSİ (SLASH) --- */
+.portrait-wrapper { position: relative; }
+.damage-slash {
+    position: absolute; top: 50%; left: -20%; width: 140%; height: 15px;
+    background: #ff0000; box-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000;
+    transform: rotate(-45deg) scaleX(0); transform-origin: left center;
+    z-index: 10; pointer-events: none; border-radius: 50%;
+}
+.damage-slash.active { animation: doSlash 0.5s ease-out forwards; }
+
+@keyframes doSlash {
+    0% { transform: rotate(-45deg) scaleX(0); opacity: 1; }
+    50% { transform: rotate(-45deg) scaleX(1); opacity: 1; }
+    100% { transform: rotate(-45deg) scaleX(1); opacity: 0; }
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-10px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+
+/* =========================================
+   ŞİMŞEK VE GÖK GÜRÜLTÜSÜ ETKİLEŞİMİ
+   ========================================= */
+
+/* Bulutların tıklanabilir olduğunu gösteren imleç */
+/* =========================================
+   GERÇEKÇİ GÖKYÜZÜ PATLAMASI (FLICKER)
+   ========================================= */
+
+.interactive-cloud {
+    cursor: pointer;
+    pointer-events: auto; 
+    transition: filter 0.2s;
+}
+
+.interactive-cloud:hover {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) brightness(1.5);
+}
+
+/* Tüm gökyüzünü kaplayan gerçekçi parlama */
+.lightning-flash-overlay {
+    position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: #fff; /* Ekranı bembeyaz yapar */
+    z-index: 99; opacity: 0; pointer-events: none;
+}
+
+/* İnternette bulduğun koddaki o gerçekçi titreme efekti */
+.lightning-flash-overlay.flash {
+    animation: realisticFlash 1.2s ease-out forwards;
+}
+
+@keyframes realisticFlash {
+    0% { opacity: 0; } 
+    10% { opacity: 0.9; } /* İlk sert patlama */
+    20% { opacity: 0.1; } /* Geri çekilme */
+    30% { opacity: 0.7; } /* İkinci titreşim */
+    40% { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+
+
+
+/* =========================================
+   HATA ÇÖZÜMLERİ: TIKLAMA VE BULUT ALANI
+   ========================================= */
+
+/* --- 1. GÖRÜNMEZ CAM DUVARI KIRMA --- */
+/* Ekranı kaplayan ana div tıklamaları arka plana (bulutlara) geçirsin */
+.full-screen-container {
+    pointer-events: none; 
+}
+
+/* Ancak sitenin menüleri, butonları ve arenası tıklanabilir kalmaya devam etsin */
+.author-selector-container, 
+.music-container, 
+.vs-btn-container, 
+.portrait-container, 
+.nav-btn, 
+.info-card-section, 
+.lamp-hitbox {
+    pointer-events: auto;
+}
+
+/* --- 2. BULUTLARIN TIKLAMA (HITBOX) ALANINI BÜYÜTME --- */
+/* Tarayıcı gölgelere tıklatmadığı için bulutun etrafına görünmez devasa bir tıklama alanı çiziyoruz */
+.interactive-cloud::after {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: -50px;
+    width: 250px;
+    height: 120px;
+    background: transparent;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+/* =========================================
+   KANLI AY (BLOOD MOON) TEMASI
+   ========================================= */
+
+#interactiveMoon {
+    cursor: pointer;
+    pointer-events: auto; /* Tıklanabilmesi için şart */
+    transition: all 0.5s ease;
+}
+
+/* --- KANLI AY AKTİF OLDUĞUNDA SİTEYE UYGULANACAKLAR --- */
+
+/* Arka plan kızıl/siyah bir tona bürünür */
+body.theme-blood-moon {
+    background: linear-gradient(180deg, #1a0000 0%, #050000 100%);
+    --rain-color: rgba(255, 0, 0, 0.7); /* Yağmur kan rengi olur */
+}
+
+/* Gökyüzü kararıp kızıllaşır */
+body.theme-blood-moon .css-sky {
+    background: linear-gradient(180deg, #3a0000 0%, #1a0000 50%, #000000 100%);
+}
+
+/* Ay kıpkırmızı parlar */
+body.theme-blood-moon .css-moon {
+    box-shadow: -18px 8px 0 0 #ff0000;
+    filter: drop-shadow(0 0 30px rgba(255, 0, 0, 0.8));
+}
+
+/* Bulutlar kasvetli ve kan rengi bir silüete dönüşür */
+body.theme-blood-moon .css-cloud {
+    background-color: #2b0505;
+    box-shadow: 
+        30px -20px 0 0 #2b0505, 60px -20px 0 0 #2b0505, 
+        90px 0 0 0 #2b0505, 120px 0 0 0 #2b0505, 
+        30px 20px 0 0 #2b0505, 60px 20px 0 0 #2b0505, 
+        -30px 0 0 0 #2b0505;
+}
+
+/* Neon Izgara Cyan/Mavi yerine Kırmızı neonla akar */
+body.theme-blood-moon .neon-grid {
+    background-image:
+        linear-gradient(rgba(255, 0, 0, 0.8) 3px, transparent 3px),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.8) 3px, transparent 3px);
+}
+
+/* =========================================
+   HATA ÇÖZÜMÜ: AYIN TIKLANABİLİR ALANI
+   ========================================= */
+
+#interactiveMoon {
+    z-index: 90; /* Tıklamayı yağmur veya yıldızlar engellemesin diye öne aldık */
+}
+
+/* Ayın görsel kısmını (hilali) tam ortalayacak görünmez dev bir tıklama kutusu */
+#interactiveMoon::after {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+/* =========================================
+   TERMİNAL/DAKTİLO YAZISI (KASMA YAPMAZ, GÖZ YORMAZ)
+   ========================================= */
+.ticker-wrap {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.85);
+    border-top: 2px solid #0ff; 
+    box-shadow: 0 -5px 15px rgba(0, 255, 255, 0.2);
+    z-index: 1000; 
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Yazıyı tam ekranın ortasına sabitler */
+    pointer-events: none; 
+}
+
+.typewriter-text {
+    font-family: 'Courier New', Courier, monospace; 
+    font-size: 16px;
+    color: #fff;
+    text-shadow: 1px 1px 0px #000, 0 0 8px #0ff;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Yanıp sönen terminal imleci (_) */
+.cursor {
+    font-family: 'Courier New', Courier, monospace; 
+    font-size: 18px;
+    color: #0ff;
+    font-weight: bold;
+    animation: blinkCursor 0.8s infinite;
+    margin-left: 5px;
+}
+
+@keyframes blinkCursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* --- KANLI AY RİTÜELİ TEPKİSİ --- */
+body.theme-blood-moon .ticker-wrap {
+    border-top-color: #f00;
+    background-color: rgba(30, 0, 0, 0.9);
+    box-shadow: 0 -5px 15px rgba(255, 0, 0, 0.3);
+}
+
+body.theme-blood-moon .typewriter-text {
+    color: #fff;
+    text-shadow: 1px 1px 0px #000, 0 0 8px #f00; /* Kan kırmızı parlama */
+}
+
+body.theme-blood-moon .cursor {
+    color: #f00;
+}
+
+
+
+
+
+/* =========================================
+   SİNEMATİK ANİME BİTİRİŞ EFEKTİ (FINISHER)
+   ========================================= */
+
+.cinematic-finisher {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 100; 
+    display: none;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.cinematic-finisher.active {
+    display: flex;
+}
+
+/* Arka planı aniden karartan flaş */
+.finisher-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    animation: fadeInBg 0.1s forwards;
+}
+
+/* Çapraz geçen kesik (Anime stili yatay/çapraz şerit) */
+.finisher-stripe {
+    position: relative;
+    width: 150%;
+    height: 45vh; /* Eski 35vh dar kalıyordu, 45vh yaptık */
+    background: #ff003c; 
+    border-top: 8px solid #fff;
+    border-bottom: 8px solid #fff;
+    box-shadow: 0 0 50px #ff003c, inset 0 0 30px #000;
+    transform: skewY(-15deg) scaleY(0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    animation: slashOpen 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s forwards,
+               shakeStripe 0.1s infinite 0.6s;
+}
+
+/* Kazananın resmi */
+/* Resmin aşırı yakınlaşmasını iptal ettik ve tam sığdırdık */
+.finisher-stripe img {
+    height: 130%; /* Kesilmeden tüm şeridi dolduracak */
+    width: auto;
+    object-fit: contain; /* Resmi kırpmadan (cover yerine contain) şeride sığdırır */
+    transform: skewY(15deg) scale(1); 
+    filter: contrast(1.2) drop-shadow(0 0 20px #fff);
+    animation: zoomInCharacter 2.5s ease-out forwards;
+}
+/* KAZANDI Yazısı */
+.finisher-text {
+    position: absolute;
+    font-size: 60px;
+    color: #fff;
+    text-shadow: 4px 4px 0px #000, -4px -4px 0px #000, 0 0 30px #fff;
+    font-style: italic;
+    letter-spacing: 5px;
+    transform: skewY(15deg) scale(2);
+    opacity: 0;
+    white-space: nowrap;
+    animation: flashText 0.5s steps(3) 0.7s forwards;
+}
+
+/* Sinematik Animasyon Keyframeleri */
+@keyframes fadeInBg { 0% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes slashOpen { 0% { transform: skewY(-15deg) scaleY(0); } 100% { transform: skewY(-15deg) scaleY(1); } }
+@keyframes shakeStripe { 0% { margin-left: -5px; } 50% { margin-left: 5px; } 100% { margin-left: 0; } }
+/* Büyüme (Zoom) oranını çok abartılı olmayacak şekilde düşürdük */
+@keyframes zoomInCharacter { 
+    0% { transform: skewY(15deg) scale(1) translateX(-20px); } 
+    100% { transform: skewY(15deg) scale(1.1) translateX(0); } 
+}
+@keyframes flashText { 0% { opacity: 0; transform: skewY(15deg) scale(2); } 100% { opacity: 1; transform: skewY(15deg) scale(1); } }    
+
+/* =========================================
+   RPG GÖREV PANOSU (QUEST LOG)
+   ========================================= */
+
+/* =========================================
+   GÖREV EKLEME FORMU TASARIMI
+   ========================================= */
+
+.quest-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border: 2px dashed #d4af37;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.quest-input {
+    background: #222;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    outline: none;
+}
+
+.quest-input:focus {
+    border-color: #0ff;
+    box-shadow: 0 0 5px #0ff;
+}
+
+.add-quest-btn {
+    background: #d4af37;
+    color: #000;
+    border: none;
+    padding: 10px;
+    font-weight: bold;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.add-quest-btn:hover {
+    background: #fff;
+    box-shadow: 0 0 10px #d4af37;
+}
+
+/* Görevi Veren Kişinin İsmi (Ufak Etiket) */
+.quest-author-tag {
+    display: inline-block;
+    background: #d4af37;
+    color: #000;
+    padding: 2px 5px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    border-radius: 3px;
+}
+
+/* Görev Panosu Arka Plan Camı */
+.quest-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10005; /* Her şeyin üstünde */
+    display: none; /* Butona basılana kadar gizli */
+    justify-content: center;
+    align-items: center;
+}
+
+.quest-overlay.active {
+    display: flex;
+}
+
+/* Panonun Kendisi */
+.quest-board {
+    background: #111;
+    border: 4px solid #d4af37; /* RPG Altın Çerçeve */
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), inset 0 0 20px rgba(0,0,0,0.8);
+    width: 90%;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 10px;
+    position: relative;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.quest-board h2 {
+    text-align: center;
+    color: #d4af37;
+    text-shadow: 2px 2px 0px #000;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+}
+
+/* Kapatma Butonu */
+.close-btn {
+    position: absolute;
+    top: -15px; right: -15px;
+    background: #f00;
+    color: #fff;
+    border: 4px solid #fff;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: transform 0.2s;
+}
+.close-btn:hover { transform: scale(1.1); }
+
+/* Görev Listesi */
+.quest-list { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0;
+    max-height: 50vh; 
+    overflow-y: auto; 
+}
+
+/* Tekil Görev Kutusu */
+.quest-item {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid #444;
+    margin-bottom: 15px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.quest-info h3 { margin: 0 0 8px 0; color: #0ff; font-size: 18px; text-shadow: 1px 1px 0 #000; }
+.quest-info p { margin: 0; font-size: 14px; color: #aaa; line-height: 1.4; }
+
+/* Tamamla Butonu */
+.complete-btn {
+    background: transparent;
+    color: #0f0;
+    border: 2px solid #0f0;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    transition: all 0.2s;
+    margin-left: 15px;
+}
+.complete-btn:hover { background: #0f0; color: #000; }
+
+/* --- GÖREV TAMAMLANDI (YAPILDI) DURUMU --- */
+.quest-item.completed {
+    opacity: 0.6;
+    border-color: #0f0;
+    background: rgba(0, 255, 0, 0.05);
+}
+.quest-item.completed .quest-info h3 {
+    text-decoration: line-through; /* Yazının üstünü çizer */
+    color: #0f0;
+}
+.quest-item.completed .complete-btn {
+    background: #0f0;
+    color: #000;
+    cursor: default;
+    pointer-events: none; /* Bir daha tıklanmasını engeller */
+}
+
+
+/* =========================================
+   TAM EKRAN SİNEMATİK VİDEO (KASMA YAPMAZ)
+   ========================================= */
+
+/* Ana Kaplayıcı (Siyah bir perde gibi başlar) */
+.fullscreen-video-overlay {
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100vw; height: 100vh;
+    z-index: 20000; 
+    background: #000;
+    display: none; 
+    opacity: 0; 
+    transition: opacity 1s ease-in-out; /* Yavaşça, sinematik bir şekilde aydınlanır */
+    pointer-events: auto; 
+}
+
+/* Aktif olduğunda ekranı kaplar */
+.fullscreen-video-overlay.active { 
+    display: block; 
+    opacity: 1; 
+}
+
+/* Videonun Kendisi */
+.fullscreen-video {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; /* Ekranın neresi olursa olsun boşluk bırakmadan doldurur */
+    pointer-events: none; /* Fare tıklamalarının videoyu durdurmasını engeller */
+    
+    /* --- KASMA ÖNLEYİCİ (ANTI-LAG) KODLAR --- */
+    transform: translateZ(0); /* Ekran kartını (GPU) zorla devreye sokar */
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: opacity; /* Tarayıcıya videonun değişeceğini önceden haber verir */
+}
+
+/* Kapatma Butonu */
+.close-video-btn {
+    position: absolute; 
+    bottom: 40px; left: 50%; 
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6); 
+    color: #fff; 
+    border: 2px solid #0ff;
+    padding: 15px 30px; 
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px; 
+    cursor: pointer;
+    z-index: 20001; 
+    transition: 0.3s;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.close-video-btn:hover { 
+    background: #0ff; 
+    color: #000; 
+    box-shadow: 0 0 30px #0ff; 
+}

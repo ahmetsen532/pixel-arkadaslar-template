@@ -1,0 +1,261 @@
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pixel Art Team - Life on Screen</title>
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+    <!-- Müzik Kontrol Butonu -->
+    <div class="music-container">
+        <button id="music-toggle" class="pixel-btn">
+            <span id="music-icon">🎵</span>
+        </button>
+    </div>
+<!-- Sol Üst: VS Modu Butonu (Müzik butonunun hemen altına ekleyebilirsin) -->
+    <div class="vs-btn-container">
+        <button id="openVsBtn" class="pixel-btn">
+            ⚔️ VS MODU
+        </button>
+            <button id="questBtn" class="pixel-btn" style="margin-top: 15px;">📜 GÖREV PANOSU</button>
+
+    </div>
+
+    <!-- GÖREV PANOSU BUTONU (Artık VS Butonunun Altında) -->
+
+    <!-- GÖREV PANOSU ARAYÜZÜ -->
+    <div id="questBoardOverlay" class="quest-overlay">
+        <div class="quest-board">
+            <button id="closeQuestBtn" class="close-btn">X</button>
+            <h2>⚔️ ORTAK GÖREVLER ⚔️</h2>
+            
+            <!-- YENİ: GÖREV EKLEME FORMU -->
+            <div class="quest-form">
+                <select id="questAuthor" class="quest-input">
+                    <option value="" disabled selected>Kimsin?</option>
+                    <option value="İsim1">İsim1</option>
+                    <option value="İsim2">İsim2</option>
+                    <option value="İsim3">İsim3</option>
+                    <option value="İsim4">İsim4</option>
+                    <option value="İsim5">İsim5</option>
+                    <option value="İsim6">İsim6</option>
+                    <option value="İsim7">İsim7</option>
+                    <!-- Ekipteki diğer kişileri buraya <option> olarak ekleyebilirsin -->
+                </select>
+                <input type="text" id="questTitle" class="quest-input" placeholder="Görev Başlığı (Örn: Unity'de Işıklar)">
+                <input type="text" id="questDesc" class="quest-input" placeholder="Detaylar (Ne yapılacak?)...">
+                <button id="addQuestBtn" class="add-quest-btn">PANOYU AS 📌</button>
+            </div>
+
+            <!-- GÖREVLERİN LİSTELENECEĞİ BOŞ ALAN -->
+            <ul id="questList" class="quest-list">
+
+            </ul>
+        </div>
+    </div>
+    <!-- Ses Dosyası -->
+    <audio id="bg-audio" loop>
+        <source src="bg-music.mp3" type="audio/mpeg">
+        Tarayıcınız ses öğesini desteklemiyor.
+    </audio>
+
+<!-- YENİ: GÖK GÜRÜLTÜSÜ SESİ -->
+    <audio id="thunder-audio">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2402/2402-preview.mp3" type="audio/mpeg">
+    </audio>
+
+
+
+    <div class="retro-background">
+        <div id="lightningFlash" class="lightning-flash-overlay"></div>
+    
+            <div class="css-sky"></div>
+            
+            <div class="css-stars"></div>
+            
+          <div class="css-clouds" id="clickableClouds">
+            <div class="css-cloud cloud-1 interactive-cloud"></div>
+            <div class="css-cloud cloud-2 interactive-cloud"></div>
+            <div class="css-cloud cloud-3 interactive-cloud"></div>
+            <div class="css-cloud cloud-4 interactive-cloud"></div>
+        </div>
+
+            <div class="css-moon" id="interactiveMoon"></div>
+            
+            <div class="neon-grid"></div> 
+            <div class="streetlamp" id="cityLamp">
+    <div class="base"></div>
+    <div class="basetop"></div>
+    <div class="pole"></div>
+    <div class="poletop"></div>
+    <div class="head">
+        <div class="top"></div>
+        <div class="glass"></div>
+        <div class="bot"></div>
+    
+    </div>
+    <div class="light"></div>
+    <div class="ground-light"></div>
+
+ 
+ <!-- YENİ GÜVENLİ KEDİ -->
+    <div class="lamp-cat-container">
+        <div class="my-cat">
+            <div class="cat-face">
+                <div class="cat-ear-l"><div class="cat-inner-l"></div></div>
+                <div class="cat-ear-r"><div class="cat-inner-r"></div></div>
+                <div class="cat-eye-l"><div class="cat-eyeball"></div></div>
+                <div class="cat-eye-r"><div class="cat-eyeball"></div></div>
+                <div class="cat-nose"><div class="cat-l1"></div><div class="cat-l2"></div></div>
+            </div>
+            <div class="cat-body-part">
+                <div class="cat-paw-1"></div>
+                <div class="cat-paw-2"></div>
+                <div class="cat-tail"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- BEMBEYAZ PARLAYAN KUŞLAR -->
+<div class="birds-sky-layer" id="birdsSkyLayer">
+    <div class="bird-container bird-container-one"><div class="bird bird-one"></div></div>
+    <div class="bird-container bird-container-two"><div class="bird bird-two"></div></div>
+    <div class="bird-container bird-container-three"><div class="bird bird-three"></div></div>
+</div>
+
+
+            <div class="rain-container" id="rainContainer"></div>
+        <div class="shooting-stars-layer" id="shootingStarsLayer"></div>
+        </div>
+
+        <div class="full-screen-container" id="mainContainer">
+            <div id="lampHitbox" class="lamp-hitbox"></div>
+            <div class="author-selector-container">
+                <label for="authorSelect">BEN KİMİM?</label>
+                <select id="authorSelect" class="pixel-select">
+                    <option value="isil">İsim1</option>
+                    <option value="selman">İsim2</option>
+                    <option value="sumeyye">İsim3</option>
+                    <option value="sen">İsim4</option>
+                    <option value="samet">İsim5</option>
+                    <option value="ahmetselim">İsim6</option>
+                    <option value="humeyra">İsim7</option>
+                </select>
+            </div>
+
+            <div class="slider-section" id="sliderSection">
+                <button class="nav-btn" id="prevBtn">&lt;</button>
+                <div class="portrait-container transitioning-container" id="portraitContainer">
+                    <img src="" alt="Kişi" id="personImg" class="pixel-img">
+                    <h2 id="personName">İsim</h2>
+                    <p class="click-hint">DETAY İÇİN TIKLA</p>
+                </div>
+                <button class="nav-btn" id="nextBtn">&gt;</button>
+            </div>
+
+            <div class="info-card-section" id="infoCardSection">
+                <button class="back-btn" id="backBtn">GERİ DÖN</button>
+                <div class="card-content">
+                    <h1 id="cardTitle">İsim</h1>
+                    
+                    <div id="readMode">
+                        <div id="statsDisplay" class="stats-container"></div>
+                        <p id="cardDesc" style="margin-bottom: 30px; font-size: 16px; line-height: 1.8;">Henüz bir şey yazılmamış...</p>
+                        <button class="pixel-btn" id="editBtn">YAZI YAZ / DÜZENLE</button>
+                    </div>
+
+                    <div id="writeMode" style="display: none;">
+                        <input type="text" id="nicknameInput" class="pixel-input" placeholder="Bu kişiye isim tak" style="width: 100%; margin-bottom: 15px;">
+
+                           <!-- Puanlama Alanı -->
+        <div class="stats-edit-container">
+            <div class="stat-row"><span>ZEKA:</span> <input type="range" id="stat-zeka" min="1" max="10" value="5"> <b id="val-zeka">5</b></div>
+            <div class="stat-row"><span>SEZGİ:</span> <input type="range" id="stat-sezgi" min="1" max="10" value="5"> <b id="val-sezgi">5</b></div>
+            <div class="stat-row"><span>KAOS:</span> <input type="range" id="stat-kaos" min="1" max="10" value="5"> <b id="val-kaos">5</b></div>
+            <div class="stat-row"><span>MİZAH:</span> <input type="range" id="stat-mizah" min="1" max="10" value="5"> <b id="val-mizah">5</b></div>
+        </div>
+
+                        <textarea id="commentInput" class="pixel-textarea" placeholder="Bu kişi hakkında neler düşünüyorsun?"></textarea>
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button class="pixel-btn save-btn" id="saveBtn">KAYDET</button>
+                            <button class="pixel-btn cancel-btn" id="cancelBtn">İPTAL</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+<div id="vsArena" class="vs-arena-overlay">
+        <div class="vs-arena-content">
+            <button id="closeVsBtn" class="pixel-btn close-vs">X ÇIKIŞ</button>
+            <h1 class="vs-title">ARENAYA HOŞ GELDİN</h1>
+            
+            <div class="battlefield">
+                <!-- 1. OYUNCU (SOL) -->
+                <div class="fighter-card">
+                    <select id="p1Select" class="pixel-select"></select>
+                    <div class="hp-container">
+                        <div class="hp-bar" id="p1HpBar"></div>
+                        <span id="p1HpText" class="hp-text">20/20</span>
+                    </div>
+                    <div class="portrait-wrapper">
+                        <img id="p1Img" src="" class="pixel-img fighter-img">
+                        <!-- HASAR KESİĞİ (SLASH) -->
+                        <div id="p1Slash" class="damage-slash"></div>
+                    </div>
+                </div>
+
+                <!-- ORTA (VS ve ZAR) -->
+                <div class="battle-center">
+                    <h1 class="vs-logo">VS</h1>
+                    <div id="battleLog" class="battle-log">SAVAŞ BAŞLASIN!</div>
+                    <button id="rollDiceBtn" class="pixel-btn attack-btn">P1 ZAR AT 🎲</button>
+                </div>
+
+                <!-- 2. OYUNCU (SAĞ) -->
+                <div class="fighter-card">
+                    <select id="p2Select" class="pixel-select"></select>
+                    <div class="hp-container">
+                        <div class="hp-bar" id="p2HpBar"></div>
+                        <span id="p2HpText" class="hp-text">20/20</span>
+                    </div>
+                    <div class="portrait-wrapper">
+                        <img id="p2Img" src="" class="pixel-img fighter-img">
+                        <!-- HASAR KESİĞİ (SLASH) -->
+                        <div id="p2Slash" class="damage-slash"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- YENİ: SİNEMATİK ANİME BİTİRİŞ EKRANI -->
+            <div id="cinematicFinisher" class="cinematic-finisher">
+                <div class="finisher-bg"></div>
+                <div class="finisher-stripe">
+                    <!-- İleride buraya hiper detaylı anime portrelerini bağlayabilirsin -->
+                    <img id="finisherImg" src="" alt="Winner">
+                    <div class="finisher-text" id="finisherText">FATALITY</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- YENİ: KAYAN ATARİ YAZISI (NEWS TICKER) -->
+<!-- YENİ: TERMİNAL / DAKTİLO YAZISI (Kasma yapmaz, göz yormaz) -->
+    <div class="ticker-wrap">
+        <div id="typewriter-text" class="typewriter-text"></div><span class="cursor">_</span>
+    </div>
+
+<div id="dimensionRift" class="fullscreen-video-overlay">
+        <video id="riftVideo" class="fullscreen-video" autoplay loop muted playsinline>
+            <source src="" type="video/mp4">
+        </video>
+        
+        <button id="closeRiftBtn" class="close-video-btn">SİSTEME GERİ DÖN X</button>
+    </div>
+
+        <script src="script.js"></script>
+    </body>
+    </html>
